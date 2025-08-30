@@ -6,19 +6,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
 import java.util.*;
-
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.util.Duration;
+import javafx.animation.AnimationTimer;
 
 public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
         Pane root = new Pane();
-        Pane carLayer = new Pane();
 
         /// craeting the road;
         /// with two rectangles and two lines;
@@ -36,38 +31,95 @@ public class App extends Application {
         vLine.setStroke(Color.WHITE);
         vLine.setStrokeWidth(2);
 
-        // Add everything to root
-        root.getChildren().addAll(horizontalRoad, verticalRoad, hLine, vLine, carLayer);
+        root.getChildren().addAll(horizontalRoad, verticalRoad, hLine, vLine);
 
         Scene scene = new Scene(root, 800, 600, Color.DARKGREEN);
         List<Car> cars = new ArrayList<>();
 
         scene.setOnKeyPressed(event -> {
+            Car newCar = null;
+
             switch (event.getCode()) {
-                case LEFT -> cars.add(new Car(new Point2D(760, 270), Color.RED, 5, -1, 0));
-                case RIGHT -> cars.add(new Car(new Point2D(0, 320), Color.BLUE, 5, 1, 0)); 
-                case UP -> cars.add(new Car(
-                        new Point2D(420, 560), Color.GREEN, 5, 0, -1));
-                case DOWN -> cars.add(new Car(
-                        new Point2D(370, 0), Color.YELLOW, 5, 0, 1));
-                case R -> System.out.println("R key pressed");
-                case ESCAPE -> System.out.println("ESC key pressed");
-                default -> {
-                }
+                case LEFT:
+                    newCar = new Car(new Point2D(760, 255), Direction.LEFT);
+                    break;
+                case RIGHT:
+                    newCar = new Car(new Point2D(0, 305), Direction.RIGHT);
+                    break;
+                case UP:
+                    newCar = new Car(new Point2D(405, 560), Direction.UP);
+                    break;
+                case DOWN:
+                    newCar = new Car(new Point2D(358, 0), Direction.DOWN);
+                    break;
+                case R:
+                    System.out.println("R key pressed");
+                    break;
+                case ESCAPE:
+                    System.out.println("ESC key pressed");
+                    break;
+                default:
+                    break;
+            }
+
+            if (newCar != null) {
+                root.getChildren().add(newCar);
+                cars.add(newCar);
             }
         });
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(50), e -> {
-            carLayer.getChildren().clear();
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                for (Car car : cars) {
+                    if (car.getColor() == Color.BLUE && car.getY() > 253 && car.getDirection() == Direction.DOWN
+                            && !car.getChanged()) {
+                        car.setDirection(Direction.LEFT);
+                        car.setChanged(true);
+                    } else if (car.getColor() == Color.BLUE && car.getY() < 300 && car.getDirection() == Direction.UP
+                            && !car.getChanged()) {
+                        car.setDirection(Direction.RIGHT);
+                        car.setChanged(true);
 
-            for (Car car : cars) {
-                car.move(); // update position
-                carLayer.getChildren().add(car.getShape()); // draw car
+                    } else if (car.getColor() == Color.BLUE && car.getX() > 356 && car.getDirection() == Direction.RIGHT
+                            && !car.getChanged()) {
+                        car.setDirection(Direction.DOWN);
+                        car.setChanged(true);
+
+                    } else if (car.getColor() == Color.BLUE && car.getX() < 405 && car.getDirection() == Direction.LEFT
+                            && !car.getChanged()) {
+                        car.setDirection(Direction.UP);
+                        car.setChanged(true);
+
+                    }
+
+                    if (car.getColor() == Color.RED && car.getY() > 306 && car.getDirection() == Direction.DOWN
+                            && !car.getChanged()) {
+                        car.setDirection(Direction.RIGHT);
+                        car.setChanged(true);
+                    } else if (car.getColor() == Color.RED && car.getY() < 300 && car.getDirection() == Direction.UP
+                            && !car.getChanged()) {
+                        car.setDirection(Direction.LEFT);
+                        car.setChanged(true);
+
+                    } else if (car.getColor() == Color.RED && car.getX() > 406 && car.getDirection() == Direction.RIGHT
+                            && !car.getChanged()) {
+                        car.setDirection(Direction.UP);
+                        car.setChanged(true);
+
+                    } else if (car.getColor() == Color.RED && car.getX() < 355 && car.getDirection() == Direction.LEFT
+                            && !car.getChanged()) {
+                        car.setDirection(Direction.DOWN);
+                        car.setChanged(true);
+
+                    }
+
+                    car.move();
+                }
             }
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+        };
 
+        timer.start();
         primaryStage.setTitle("Crossroad Example");
         primaryStage.setScene(scene);
         primaryStage.show();
