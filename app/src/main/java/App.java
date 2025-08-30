@@ -10,6 +10,7 @@ import java.util.*;
 import javafx.animation.AnimationTimer;
 
 public class App extends Application {
+    public static List<Car> cars = new ArrayList<>();
 
     @Override
     public void start(Stage primaryStage) {
@@ -34,7 +35,6 @@ public class App extends Application {
         root.getChildren().addAll(horizontalRoad, verticalRoad, hLine, vLine);
 
         Scene scene = new Scene(root, 800, 600, Color.DARKGREEN);
-        List<Car> cars = new ArrayList<>();
 
         scene.setOnKeyPressed(event -> {
             Car newCar = null;
@@ -50,7 +50,7 @@ public class App extends Application {
                     newCar = new Car(new Point2D(405, 560), Direction.UP);
                     break;
                 case DOWN:
-                    newCar = new Car(new Point2D(358, 0), Direction.DOWN);
+                    newCar = new Car(new Point2D(360, 0), Direction.DOWN);
                     break;
                 case R:
                     System.out.println("R key pressed");
@@ -63,14 +63,36 @@ public class App extends Application {
             }
 
             if (newCar != null) {
-                root.getChildren().add(newCar);
-                cars.add(newCar);
+                boolean collisionDetected = false;
+                for (Car car : App.cars) {
+                    if (newCar.intersects(car)) {
+                        collisionDetected = true;
+                        break;
+                    }
+                }
+
+                if (!collisionDetected) {
+                    App.cars.add(newCar);
+                    root.getChildren().add(newCar); // Add the car to the pan
+                }
             }
         });
 
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
+                System.out.println(String.format("arrey list that holds cars size %d", cars.size()));
+                Iterator<Car> carIterator = cars.iterator();
+                while (carIterator.hasNext()) {
+                    Car car = carIterator.next();
+
+                    if (car.getX() < -50 || car.getX() > 800 || car.getY() < -50 || car.getY() > 600) {
+                        root.getChildren().remove(car);
+                        carIterator.remove();
+                        continue;
+                    }
+                }
+                int index = 0;
                 for (Car car : cars) {
                     if (car.getColor() == Color.BLUE && car.getY() > 253 && car.getDirection() == Direction.DOWN
                             && !car.getChanged()) {
@@ -114,7 +136,8 @@ public class App extends Application {
 
                     }
 
-                    car.move();
+                    car.move(index);
+                    index++;
                 }
             }
         };

@@ -12,7 +12,7 @@ public class Car extends Rectangle {
     private Color color;
 
     public Car(Point2D start, Direction direction) {
-        super(start.getX(), start.getY(), 40, 40);
+        super(start.getX(), start.getY(), 30, 30);
         Color c = randomColor();
         setFill(c);
         this.color = c;
@@ -65,9 +65,21 @@ public class Car extends Rectangle {
         return this.directionY;
     }
 
-    public void move() {
+    public void move(int index) {
         this.setX(this.getX() + (speed * directionX));
         this.setY(this.getY() + (speed * directionY));
+
+        for (int i = 0; i < App.cars.size(); i++) {
+            if (i == index)
+                continue;
+
+            Car otherCar = App.cars.get(i);
+
+            if (intersects(otherCar)) {
+                this.setX(this.getX() - (speed * directionX));
+                this.setY(this.getY() - (speed * directionY));
+            }
+        }
     }
 
     private Color randomColor() {
@@ -84,4 +96,21 @@ public class Car extends Rectangle {
                 return Color.RED;
         }
     }
+
+    public boolean intersects(Car otherCar) {
+        int size = 40;
+
+        int aLeft = (int) this.getX();
+        int aRight = (int) (this.getX() + size);
+        int aTop = (int) this.getY();
+        int aBottom = (int) (this.getY() + size);
+
+        int bLeft = (int) otherCar.getX();
+        int bRight = (int) (otherCar.getX() + size);
+        int bTop = (int) otherCar.getY();
+        int bBottom = (int) (otherCar.getY() + size);
+
+        return !(aLeft >= bRight || aRight <= bLeft || aTop >= bBottom || aBottom <= bTop);
+    }
+
 }
