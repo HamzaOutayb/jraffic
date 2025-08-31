@@ -4,7 +4,7 @@ import javafx.scene.shape.Rectangle;
 import java.util.Random;
 
 public class Car extends Rectangle {
-    private double speed = 0.1;
+    private double speed = 0.2;
     private double directionX;
     private double directionY;
     private boolean changed = false;
