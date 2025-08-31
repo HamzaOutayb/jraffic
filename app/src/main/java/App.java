@@ -56,7 +56,7 @@ public class App extends Application {
                     System.out.println("R key pressed");
                     break;
                 case ESCAPE:
-                    System.out.println("ESC key pressed");
+                    System.exit(0);
                     break;
                 default:
                     break;
@@ -73,7 +73,7 @@ public class App extends Application {
 
                 if (!collisionDetected) {
                     App.cars.add(newCar);
-                    root.getChildren().add(newCar); // Add the car to the pan
+                    root.getChildren().add(newCar);
                 }
             }
         });
@@ -83,6 +83,7 @@ public class App extends Application {
             public void handle(long now) {
                 System.out.println(String.format("arrey list that holds cars size %d", cars.size()));
                 Iterator<Car> carIterator = cars.iterator();
+                boolean redlight = true;
                 while (carIterator.hasNext()) {
                     Car car = carIterator.next();
 
@@ -94,6 +95,7 @@ public class App extends Application {
                 }
                 int index = 0;
                 for (Car car : cars) {
+
                     if (car.getColor() == Color.BLUE && car.getY() > 253 && car.getDirection() == Direction.DOWN
                             && !car.getChanged()) {
                         car.setDirection(Direction.LEFT);
@@ -119,7 +121,7 @@ public class App extends Application {
                             && !car.getChanged()) {
                         car.setDirection(Direction.RIGHT);
                         car.setChanged(true);
-                    } else if (car.getColor() == Color.RED && car.getY() < 300 && car.getDirection() == Direction.UP
+                    } else if (car.getColor() == Color.RED && car.getY() < 262 && car.getDirection() == Direction.UP
                             && !car.getChanged()) {
                         car.setDirection(Direction.LEFT);
                         car.setChanged(true);
@@ -135,9 +137,23 @@ public class App extends Application {
                         car.setChanged(true);
 
                     }
+                    
+                    if (car.getDirection() == Direction.DOWN && car.getY() > 215 && redlight && !car.getChanged()) {
 
-                    car.move(index);
+                    } else if (redlight && car.getY() < 353 && car.getDirection() == Direction.UP
+                            && !car.getChanged()) {
+
+                    } else if (redlight && car.getX() > 310 && car.getDirection() == Direction.RIGHT
+                            && !car.getChanged() && redlight) {
+
+                    } else if (redlight && car.getX() < 455 && car.getDirection() == Direction.LEFT
+                            && !car.getChanged() && redlight) {
+
+                    } else {
+                        car.move(index);
+                    }
                     index++;
+
                 }
             }
         };
